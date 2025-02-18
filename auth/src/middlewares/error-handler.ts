@@ -1,8 +1,35 @@
 import {Request, Response, NextFunction} from 'express';
+import { RequestValidationError } from '../errors/request-validation-errors';
+import { DataBaseConnectionError } from '../errors/database-connection-errors';
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.log(err.message);
-    res.status(500).json({
-        error: err
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): any => {
+    console.log(err);
+
+    if(err instanceof RequestValidationError) {
+        //console.log('validation error');
+        
+        const formattedErrors = err.errors.map((error) => {
+            if (error.type === 'field') {
+                return { message: error.msg, field: error.path };
+            }
+        })
+
+        //console.log(formattedErrors);
+        
+        return res.status(400).send({errors: formattedErrors})
+    }
+
+    if(err instanceof DataBaseConnectionError) {
+        //console.log('data-base connection error')
+        return res.status(500).send({
+            errors : [{
+                message : err.reason
+            }]
+        })
+    }
+    return res.status(500).send({
+        errors : [{
+            message : 'something went wrong!!'
+        }]
     })
 }

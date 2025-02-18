@@ -23,5 +23,5 @@ app.use(signupRouter)
 app.use(errorHandler)
 
 app.listen(3000, () => {
-    console.log('auth on 3000!')
+    console.log('auth on 3000')
 })

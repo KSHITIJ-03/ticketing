@@ -1,4 +1,4 @@
-import express, {Request, Response} from 'express';
+import express, {Request, Response, NextFunction} from 'express';
 import { body, validationResult } from 'express-validator';
 const router = express.Router();
 
@@ -10,15 +10,13 @@ router.post('/api/users/signup',
         body('password').trim().isLength({min: 8, max: 20})
             .withMessage('password should be between 8 and 20 characters')      
     ],
-    (req: Request, res: Response): Response | any => {
+    (req: Request, res: Response, next: NextFunction): Response | any => {
     
         const errors = validationResult(req);
 
         if(!errors.isEmpty()) {
             //console.log(errors);
-            return res.status(400).json({
-                errors: errors.array()
-            })
+            throw new Error('email or password is invalid')
         }
 
         

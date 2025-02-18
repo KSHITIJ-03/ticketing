@@ -1,32 +1,17 @@
 import {Request, Response, NextFunction} from 'express';
-import { RequestValidationError } from '../errors/request-validation-errors';
-import { DataBaseConnectionError } from '../errors/database-connection-errors';
+import { CustomError } from '../errors/custom-error';
 
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction): any => {
     console.log(err);
 
-    if(err instanceof RequestValidationError) {
+    if(err instanceof CustomError) {
         //console.log('validation error');
-        
-        const formattedErrors = err.errors.map((error) => {
-            if (error.type === 'field') {
-                return { message: error.msg, field: error.path };
-            }
-        })
 
         //console.log(formattedErrors);
         
-        return res.status(400).send({errors: formattedErrors})
+        return res.status(err.statusCode).send({errors: err.serializeErrors()})
     }
-
-    if(err instanceof DataBaseConnectionError) {
-        //console.log('data-base connection error')
-        return res.status(500).send({
-            errors : [{
-                message : err.reason
-            }]
-        })
-    }
+    
     return res.status(500).send({
         errors : [{
             message : 'something went wrong!!'

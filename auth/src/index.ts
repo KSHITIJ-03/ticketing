@@ -1,4 +1,5 @@
 import express from 'express';
+import 'express-async-errors'; // to throw errors immedieately for async functions
 import {json} from 'body-parser'
 
 import { currentUserRouter } from './routes/current-user';
@@ -22,12 +23,12 @@ app.use(signinRouter)
 app.use(signoutRouter)
 app.use(signupRouter)
 
-app.all('*', (req, res, next) => {
+app.all('*', () => {
     throw new NotFoundError()
 })
 
 app.use(errorHandler)
 
 app.listen(3000, () => {
-    console.log('auth on 3000')
+    console.log('auth on 3000!')
 })

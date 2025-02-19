@@ -1,6 +1,8 @@
 import express from 'express';
 import 'express-async-errors'; // to throw errors immedieately for async functions
+import mongoose from 'mongoose';
 import {json} from 'body-parser'
+
 
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
@@ -29,6 +31,17 @@ app.all('*', () => {
 
 app.use(errorHandler)
 
-app.listen(3000, () => {
-    console.log('auth on 3000!')
-})
+
+const start = async () => {
+    try {
+        await mongoose.connect('mongodb://auth-mongo-srv:27017')
+        console.log('db is connected');
+    } catch(err) {
+        console.error(err)
+    }
+    app.listen(3000, () => {
+        console.log('auth on 3000!')
+    })
+}
+
+start();

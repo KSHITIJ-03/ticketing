@@ -2,6 +2,8 @@ import express, {Request, Response, NextFunction} from 'express';
 import { body, validationResult } from 'express-validator';
 import { DataBaseConnectionError } from '../errors/database-connection-errors';
 import { RequestValidationError } from '../errors/request-validation-errors';
+import { BadRequestError } from '../errors/bad-request-error';
+import { User } from '../models/user';
 const router = express.Router();
 
 
@@ -12,7 +14,7 @@ router.post('/api/users/signup',
         body('password').trim().isLength({min: 8, max: 20})
             .withMessage('password should be between 8 and 20 characters')      
     ],
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     
         const errors = validationResult(req);
 
@@ -24,9 +26,14 @@ router.post('/api/users/signup',
         //throw new DataBaseConnectionError();
         const {email, password} = req.body
 
-        res.status(201).json({
-            message : 'user created'
-        });
+        if(await User.findOne({email})) {
+            throw new BadRequestError('email is already in use')
+        }
+
+        const user = User.build({email, password})
+        await user.save()
+
+        res.status(201).send({user})
 
 })
 

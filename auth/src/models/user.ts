@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Password } from "../services/password";
 
 interface UserAttr {
     email : string,
@@ -13,7 +14,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
 
 // interface that describes the user document
 
-interface UserDoc {
+interface UserDoc extends mongoose.Document {
     email : string,
     password : string
 }
@@ -27,6 +28,14 @@ const userSchema = new mongoose.Schema({
         type : String,
         required : true
     }
+})
+
+userSchema.pre('save', async function(done){
+    if(this.isModified('password')){
+        const hashed = await Password.toHash(this.get('password'));
+        this.set('password', hashed)
+    }
+    done()
 })
 
 userSchema.statics.build = (attr : UserAttr): UserDoc => {
@@ -43,10 +52,10 @@ const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 // }) // typeScript don't know how to statics methods on model
              // therefore it is needed to make a interface and do all that angular bracket stuff
 
-const user = User.build({
-    email : 'tim@gmail.com',
-    password : '12345678'
-}) 
+// const user = User.build({
+//     email : 'tim@gmail.com',
+//     password : '12345678'
+// }) 
 
 // new User({
 //     email : 'tim@gmail.com',

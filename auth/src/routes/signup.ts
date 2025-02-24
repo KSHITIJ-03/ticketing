@@ -34,11 +34,17 @@ router.post('/api/users/signup',
 
         // generate jwt
 
+        // if(!process.env.JWT_KEY) {
+        //     throw new Error('env variables are not defined!!')
+        // } // this should be checked at the instance of the starting of application..... all that ts paroxysm
         const userJwt = jwt.sign({
             id: user.id,
             email: user.email
-        }, 'privyet')
+        }, process.env.JWT_KEY!) // here ts wants to make sure that process.env is defined
 
+        // but here it is showing red line because ts is too cautious and did'nt know 
+        // that i have checked weather env variable is valid or not. therefore i would place a '!'
+        // mark after process.env.JWT_KEY! it indicates ts that i have checked this variable.
         // store it on session object
 
         req.session = {

@@ -41,6 +41,10 @@ app.use(errorHandler)
 
 
 const start = async () => {
+
+    if(!process.env.JWT_KEY) {
+        throw new Error('env variables are not defined!!')
+    }
     try {
         await mongoose.connect('mongodb://auth-mongo-srv:27017')
         console.log('db is connected');

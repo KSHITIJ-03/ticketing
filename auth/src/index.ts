@@ -2,7 +2,7 @@ import express from 'express';
 import 'express-async-errors'; // to throw errors immedieately for async functions
 import mongoose from 'mongoose';
 import {json} from 'body-parser'
-
+import cookieSession from 'cookie-session';
 
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
@@ -13,7 +13,15 @@ import { errorHandler } from './middlewares/error-handler';
 import { NotFoundError } from './errors/not-found-error';
 
 const app = express()
+app.set('trust proxy', true)
 app.use(json())
+
+app.use(
+    cookieSession({
+        signed: false, // jwt is already encrypted 
+        secure: true
+    })
+)
 
 // app.get('/api/users/currentuser', (req, res) => {
 //     console.log('this is current user');

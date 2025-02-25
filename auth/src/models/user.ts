@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Password } from "../services/password";
+import { transform } from "typescript";
 
 interface UserAttr {
     email : string,
@@ -27,6 +28,16 @@ const userSchema = new mongoose.Schema({
     password : {
         type : String,
         required : true
+    }
+},
+{
+    toJSON: { // to reflect a standard response to the client whenever a user doc is used
+        transform(doc, ret) {
+            ret.id = doc._id;
+            delete ret._id;
+            delete ret.password;
+            delete ret.__v;
+        }
     }
 })
 
